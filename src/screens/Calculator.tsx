@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 import React, {useState} from 'react';
 import {Text, SafeAreaView, View} from 'react-native';
 import {CalculatorButton} from '../components/CalculatorButton';
@@ -22,6 +23,18 @@ export const Calculator = () => {
   };
 
   const getResult = (num: string) => {
+    if (result.includes('.') && num === '.') return;
+    if (result.startsWith('0') || result.startsWith('-0')) {
+      if (num === '.') {
+        setResult(result + num);
+      } else if (num === '0' && num.includes('.')) {
+        setResult(result + num);
+      } else if (result !== '0' && !num.includes('.')) {
+        setResult(num);
+      } else if (num === '0' && !result.includes('.')) {
+        setResult(result);
+      }
+    }
     setResult(result + num);
   };
 
