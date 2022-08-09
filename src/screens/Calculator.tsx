@@ -55,8 +55,9 @@ export const Calculator = () => {
       } else {
         setResult(result + num);
       }
+    } else {
+      setResult(result + num);
     }
-    setResult(result + num);
   };
 
   const positiveNegative = () => {
@@ -74,6 +75,7 @@ export const Calculator = () => {
       negative = '-';
       temporaryValue = result.substring(1);
     }
+
     if (temporaryValue.length > 1) {
       setResult(negative + temporaryValue.slice(0, -1));
     } else {
@@ -81,7 +83,7 @@ export const Calculator = () => {
     }
   };
 
-  const backToPreviousValue = () => {
+  const changeToPreviousValue = () => {
     if (result.endsWith('.')) {
       setPreviousResult(result.slice(0, -1));
     } else {
@@ -91,22 +93,48 @@ export const Calculator = () => {
   };
 
   const onDividePress = () => {
-    backToPreviousValue();
+    changeToPreviousValue();
     lastOperation.current = Operations.divide;
   };
 
   const onMultiplyPress = () => {
-    backToPreviousValue();
+    changeToPreviousValue();
     lastOperation.current = Operations.multiply;
   };
   const onSubstractPress = () => {
-    backToPreviousValue();
+    changeToPreviousValue();
     lastOperation.current = Operations.substract;
   };
   const onAddPress = () => {
-    backToPreviousValue();
+    changeToPreviousValue();
     lastOperation.current = Operations.add;
   };
+
+  const calculate = () => {
+    const num1 = Number(result);
+    const num2 = Number(previousResult);
+
+    switch (lastOperation.current) {
+      case Operations.add:
+        setResult(`${num1 + num2}`);
+        break;
+
+      case Operations.substract:
+        setResult(`${num2 - num1}`);
+        break;
+
+      case Operations.multiply:
+        setResult(`${num1 * num2}`);
+        break;
+
+      case Operations.divide:
+        setResult(`${num2 / num1}`);
+        break;
+    }
+
+    setPreviousResult('0');
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.calculatorContainer}>
@@ -158,7 +186,7 @@ export const Calculator = () => {
               operator={OPERATORS.ADD}
             />
             <CalculatorButton
-              onPress={() => undefined}
+              onPress={calculate}
               color={styles.orangeItem}
               operator={OPERATORS.EQUALS}
             />
@@ -167,9 +195,10 @@ export const Calculator = () => {
           <View style={styles.integers}>
             {Array.from(Array(10).keys())
               .reverse()
-              .map((chart: number) =>
+              .map((chart: number, index) =>
                 chart === 0 ? (
                   <CalculatorButton
+                    key={String(`${chart}_${index}`)}
                     onPress={getResult}
                     extraStyle
                     color={styles.darkGrayItem}
@@ -177,6 +206,7 @@ export const Calculator = () => {
                   />
                 ) : (
                   <CalculatorButton
+                    key={String(`${chart}_${index}`)}
                     onPress={getResult}
                     color={styles.darkGrayItem}
                     operator={String(chart)}
