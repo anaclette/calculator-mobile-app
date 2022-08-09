@@ -8,9 +8,9 @@ export const Calculator = () => {
   const [previousResult, setPreviousResult] = useState('0');
   const [result, setResult] = useState('0');
   const OPERATORS = {
-    DEL: 'C',
+    CLEAN: 'C',
     POSITIVE_NEGATIVE: '+/-',
-    PERCENT: '%',
+    DEL: 'del',
     DIVIDE: '÷',
     MULTIPLY: 'x',
     SUBTRACTION: '-',
@@ -18,7 +18,7 @@ export const Calculator = () => {
     EQUALS: '=',
   };
 
-  const onDeletePress = () => {
+  const onCleanPress = () => {
     setResult('0');
   };
 
@@ -56,9 +56,9 @@ export const Calculator = () => {
 
         <View style={styles.rowOperators}>
           <CalculatorButton
-            onPress={onDeletePress}
+            onPress={onCleanPress}
             color={styles.grayItem}
-            operator={OPERATORS.DEL}
+            operator={OPERATORS.CLEAN}
           />
           <CalculatorButton
             onPress={positiveNegative}
@@ -68,7 +68,7 @@ export const Calculator = () => {
           <CalculatorButton
             onPress={getResult}
             color={styles.grayItem}
-            operator={OPERATORS.PERCENT}
+            operator={OPERATORS.DEL}
           />
           <CalculatorButton
             onPress={getResult}
