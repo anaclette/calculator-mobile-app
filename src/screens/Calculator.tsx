@@ -9,7 +9,7 @@ export const Calculator = () => {
   const OPERATORS = {
     DEL: 'C',
     POSITIVE_NEGATIVE: '+/-',
-    PERCENTAGE: '%',
+    PERCENT: '%',
     DIVIDE: '÷',
     MULTIPLY: 'x',
     SUBTRACTION: '-',
@@ -55,7 +55,7 @@ export const Calculator = () => {
           <CalculatorButton
             onPress={getResult}
             color={styles.grayItem}
-            operator={OPERATORS.PERCENTAGE}
+            operator={OPERATORS.PERCENT}
           />
           <CalculatorButton
             onPress={getResult}
