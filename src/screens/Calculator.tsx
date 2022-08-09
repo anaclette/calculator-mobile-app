@@ -1,12 +1,22 @@
 /* eslint-disable curly */
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Text, SafeAreaView, View} from 'react-native';
 import {CalculatorButton} from '../components/CalculatorButton';
 import {styles} from '../theme/appTheme';
 
+enum Operations {
+  add,
+  substract,
+  multiply,
+  divide,
+}
+
 export const Calculator = () => {
   const [previousResult, setPreviousResult] = useState('0');
   const [result, setResult] = useState('0');
+
+  const lastOperation = useRef<Operations>();
+
   const OPERATORS = {
     CLEAN: 'C',
     POSITIVE_NEGATIVE: '+/-',
@@ -20,19 +30,30 @@ export const Calculator = () => {
 
   const onCleanPress = () => {
     setResult('0');
+    setPreviousResult('0');
   };
 
   const getResult = (num: string) => {
+    // Reject double floating point
     if (result.includes('.') && num === '.') return;
     if (result.startsWith('0') || result.startsWith('-0')) {
+      // decimal floating point
       if (num === '.') {
         setResult(result + num);
+
+        // check if input is another zero and has floating point
       } else if (num === '0' && num.includes('.')) {
         setResult(result + num);
+
+        // check if input is diff from zero and has no floating point
       } else if (result !== '0' && !num.includes('.')) {
         setResult(num);
+
+        // prevent from 0000.0
       } else if (num === '0' && !result.includes('.')) {
         setResult(result);
+      } else {
+        setResult(result + num);
       }
     }
     setResult(result + num);
@@ -60,10 +81,38 @@ export const Calculator = () => {
     }
   };
 
+  const backToPreviousValue = () => {
+    if (result.endsWith('.')) {
+      setPreviousResult(result.slice(0, -1));
+    } else {
+      setPreviousResult(result);
+    }
+    setResult('0');
+  };
+
+  const onDividePress = () => {
+    backToPreviousValue();
+    lastOperation.current = Operations.divide;
+  };
+
+  const onMultiplyPress = () => {
+    backToPreviousValue();
+    lastOperation.current = Operations.multiply;
+  };
+  const onSubstractPress = () => {
+    backToPreviousValue();
+    lastOperation.current = Operations.substract;
+  };
+  const onAddPress = () => {
+    backToPreviousValue();
+    lastOperation.current = Operations.add;
+  };
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.calculatorContainer}>
-        <Text style={styles.previousResult}>{previousResult}</Text>
+        {previousResult !== '0' && (
+          <Text style={styles.previousResult}>{previousResult}</Text>
+        )}
         <Text numberOfLines={1} adjustsFontSizeToFit style={styles.result}>
           {result}
         </Text>
@@ -85,7 +134,7 @@ export const Calculator = () => {
             operator={OPERATORS.DEL}
           />
           <CalculatorButton
-            onPress={getResult}
+            onPress={onDividePress}
             color={styles.orangeItem}
             operator={OPERATORS.DIVIDE}
           />
@@ -94,22 +143,22 @@ export const Calculator = () => {
         <View style={styles.rowColumns}>
           <View style={styles.colOperators}>
             <CalculatorButton
-              onPress={getResult}
+              onPress={onMultiplyPress}
               color={styles.orangeItem}
               operator={OPERATORS.MULTIPLY}
             />
             <CalculatorButton
-              onPress={getResult}
+              onPress={onSubstractPress}
               color={styles.orangeItem}
               operator={OPERATORS.SUBTRACTION}
             />
             <CalculatorButton
-              onPress={getResult}
+              onPress={onAddPress}
               color={styles.orangeItem}
               operator={OPERATORS.ADD}
             />
             <CalculatorButton
-              onPress={getResult}
+              onPress={() => undefined}
               color={styles.orangeItem}
               operator={OPERATORS.EQUALS}
             />
