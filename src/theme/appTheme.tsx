@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
   },
   darkGrayItem: {
     backgroundColor: '#2D2D2D',
-    color: 'gray',
+    color: 'white',
   },
   orangeItem: {
     color: 'white',
