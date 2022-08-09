@@ -46,6 +46,20 @@ export const Calculator = () => {
     }
   };
 
+  const onDeletePress = () => {
+    let negative = '';
+    let temporaryValue = result;
+    if (result.includes('-')) {
+      negative = '-';
+      temporaryValue = result.substring(1);
+    }
+    if (temporaryValue.length > 1) {
+      setResult(negative + temporaryValue.slice(0, -1));
+    } else {
+      setResult('0');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.calculatorContainer}>
@@ -66,7 +80,7 @@ export const Calculator = () => {
             operator={OPERATORS.POSITIVE_NEGATIVE}
           />
           <CalculatorButton
-            onPress={getResult}
+            onPress={onDeletePress}
             color={styles.grayItem}
             operator={OPERATORS.DEL}
           />
