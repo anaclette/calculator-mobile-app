@@ -1,95 +1,86 @@
-/* eslint-disable curly */
 import React, {useRef, useState} from 'react';
 import {Text, SafeAreaView, View} from 'react-native';
 import {CalculatorButton} from '../components/CalculatorButton';
 import {styles} from '../theme/appTheme';
 
 enum Operations {
-  add,
-  substract,
-  multiply,
-  divide,
+  clean = 'C',
+  positive_negative = '+/-',
+  delete = 'del',
+  add = '+',
+  substract = '-',
+  multiply = 'x',
+  divide = '/',
+  equal = '=',
 }
 
 export const Calculator = () => {
-  const [previousResult, setPreviousResult] = useState('0');
-  const [result, setResult] = useState('0');
+  const [previousInput, setPreviousInput] = useState('0');
+  const [inputNum, setInputNum] = useState('0');
 
   const lastOperation = useRef<Operations>();
 
-  const OPERATORS = {
-    CLEAN: 'C',
-    POSITIVE_NEGATIVE: '+/-',
-    DEL: 'del',
-    DIVIDE: '÷',
-    MULTIPLY: 'x',
-    SUBTRACTION: '-',
-    ADD: '+',
-    EQUALS: '=',
-  };
-
   const onCleanPress = () => {
-    setResult('0');
-    setPreviousResult('0');
+    setInputNum('0');
+    setPreviousInput('0');
   };
 
-  const getResult = (num: string) => {
+  const buildNumber = (numText: string) => {
     // Reject double floating point
-    if (result.includes('.') && num === '.') return;
-    if (result.startsWith('0') || result.startsWith('-0')) {
+    if (inputNum.includes('.') && numText === '.') {
+      return;
+    }
+    if (inputNum.startsWith('0') || inputNum.startsWith('-0')) {
       // decimal floating point
-      if (num === '.') {
-        setResult(result + num);
+      if (numText === '.') {
+        setInputNum(inputNum + numText);
 
-        // check if input is another zero and has floating point
-      } else if (num === '0' && num.includes('.')) {
-        setResult(result + num);
+        // check if input is another zero and outcome has a floating point
+      } else if (numText === '0' && inputNum.includes('.')) {
+        setInputNum(inputNum + numText);
 
-        // check if input is diff from zero and has no floating point
-      } else if (result !== '0' && !num.includes('.')) {
-        setResult(num);
+        // check if input is diff from zero and outcome has no floating point
+      } else if (numText !== '0' && !inputNum.includes('.')) {
+        setInputNum(numText);
 
         // prevent from 0000.0
-      } else if (num === '0' && !result.includes('.')) {
-        setResult(result);
+      } else if (numText === '0' && !inputNum.includes('.')) {
+        setInputNum(inputNum);
       } else {
-        setResult(result + num);
+        setInputNum(inputNum + numText);
       }
     } else {
-      setResult(result + num);
+      setInputNum(inputNum + numText);
     }
   };
 
   const positiveNegative = () => {
-    if (result.includes('-')) {
-      setResult(result.replace('-', ''));
-    } else {
-      setResult('-' + result);
-    }
+    inputNum.includes('-')
+      ? setInputNum(inputNum.replace('-', ''))
+      : setInputNum('-' + inputNum);
   };
-
   const onDeletePress = () => {
     let negative = '';
-    let temporaryValue = result;
-    if (result.includes('-')) {
+    let temporaryValue = inputNum;
+    if (inputNum.includes('-')) {
       negative = '-';
-      temporaryValue = result.substring(1);
+      temporaryValue = inputNum.substring(1);
     }
 
     if (temporaryValue.length > 1) {
-      setResult(negative + temporaryValue.slice(0, -1));
+      setInputNum(negative + temporaryValue.slice(0, -1));
     } else {
-      setResult('0');
+      setInputNum('0');
     }
   };
 
   const changeToPreviousValue = () => {
-    if (result.endsWith('.')) {
-      setPreviousResult(result.slice(0, -1));
+    if (inputNum.endsWith('.')) {
+      setPreviousInput(inputNum.slice(0, -1));
     } else {
-      setPreviousResult(result);
+      setPreviousInput(inputNum);
     }
-    setResult('0');
+    setInputNum('0');
   };
 
   const onDividePress = () => {
@@ -101,70 +92,72 @@ export const Calculator = () => {
     changeToPreviousValue();
     lastOperation.current = Operations.multiply;
   };
+
   const onSubstractPress = () => {
     changeToPreviousValue();
     lastOperation.current = Operations.substract;
   };
+
   const onAddPress = () => {
     changeToPreviousValue();
     lastOperation.current = Operations.add;
   };
 
   const calculate = () => {
-    const num1 = Number(result);
-    const num2 = Number(previousResult);
+    const num1 = Number(inputNum);
+    const num2 = Number(previousInput);
 
     switch (lastOperation.current) {
       case Operations.add:
-        setResult(`${num1 + num2}`);
+        setInputNum(`${num1 + num2}`);
         break;
 
       case Operations.substract:
-        setResult(`${num2 - num1}`);
+        setInputNum(`${num2 - num1}`);
         break;
 
       case Operations.multiply:
-        setResult(`${num1 * num2}`);
+        setInputNum(`${num1 * num2}`);
         break;
 
       case Operations.divide:
-        setResult(`${num2 / num1}`);
+        setInputNum(`${num2 / num1}`);
         break;
     }
 
-    setPreviousResult('0');
+    setPreviousInput('0');
   };
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.calculatorContainer}>
-        {previousResult !== '0' && (
-          <Text style={styles.previousResult}>{previousResult}</Text>
+        {previousInput !== '0' && (
+          <Text style={styles.previousInput}>{previousInput}</Text>
         )}
-        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.result}>
-          {result}
+        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.inputNum}>
+          {inputNum}
         </Text>
 
         <View style={styles.rowOperators}>
           <CalculatorButton
             onPress={onCleanPress}
             color={styles.grayItem}
-            operator={OPERATORS.CLEAN}
+            operator={Operations.clean}
           />
           <CalculatorButton
             onPress={positiveNegative}
             color={styles.grayItem}
-            operator={OPERATORS.POSITIVE_NEGATIVE}
+            operator={Operations.positive_negative}
           />
           <CalculatorButton
             onPress={onDeletePress}
             color={styles.grayItem}
-            operator={OPERATORS.DEL}
+            operator={Operations.delete}
           />
           <CalculatorButton
             onPress={onDividePress}
             color={styles.orangeItem}
-            operator={OPERATORS.DIVIDE}
+            operator={Operations.divide}
           />
         </View>
 
@@ -173,22 +166,22 @@ export const Calculator = () => {
             <CalculatorButton
               onPress={onMultiplyPress}
               color={styles.orangeItem}
-              operator={OPERATORS.MULTIPLY}
+              operator={Operations.multiply}
             />
             <CalculatorButton
               onPress={onSubstractPress}
               color={styles.orangeItem}
-              operator={OPERATORS.SUBTRACTION}
+              operator={Operations.substract}
             />
             <CalculatorButton
               onPress={onAddPress}
               color={styles.orangeItem}
-              operator={OPERATORS.ADD}
+              operator={Operations.add}
             />
             <CalculatorButton
               onPress={calculate}
               color={styles.orangeItem}
-              operator={OPERATORS.EQUALS}
+              operator={Operations.equal}
             />
           </View>
 
@@ -199,7 +192,7 @@ export const Calculator = () => {
                 chart === 0 ? (
                   <CalculatorButton
                     key={String(`${chart}_${index}`)}
-                    onPress={getResult}
+                    onPress={buildNumber}
                     extraStyle
                     color={styles.darkGrayItem}
                     operator={String(chart)}
@@ -207,14 +200,14 @@ export const Calculator = () => {
                 ) : (
                   <CalculatorButton
                     key={String(`${chart}_${index}`)}
-                    onPress={getResult}
+                    onPress={buildNumber}
                     color={styles.darkGrayItem}
                     operator={String(chart)}
                   />
                 ),
               )}
             <CalculatorButton
-              onPress={getResult}
+              onPress={buildNumber}
               color={styles.darkGrayItem}
               operator="."
             />

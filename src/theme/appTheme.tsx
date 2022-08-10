@@ -10,12 +10,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: 'flex-end',
   },
-  result: {
+  inputNum: {
     fontSize: 60,
     textAlign: 'right',
     color: 'white',
   },
-  previousResult: {
+  previousInput: {
     fontSize: 30,
     textAlign: 'right',
     color: 'rgba(255,255,255,0.5)',
